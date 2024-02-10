@@ -35,8 +35,8 @@ const combineDocumentsFn = (docs: Document[], separator = '\n\n') => {
 };
 
 export const makeChain = (retriever: VectorStoreRetriever) => {
-  const condenseQuestionPrompt =
-    ChatPromptTemplate.fromTemplate(CONDENSE_TEMPLATE);
+  // const condenseQuestionPrompt =
+  //   ChatPromptTemplate.fromTemplate(CONDENSE_TEMPLATE);
   const answerPrompt = ChatPromptTemplate.fromTemplate(QA_TEMPLATE);
 
   const model = new ChatOpenAI({
@@ -44,13 +44,13 @@ export const makeChain = (retriever: VectorStoreRetriever) => {
     modelName: 'gpt-3.5-turbo', //change this to gpt-4 if you have access
   });
 
-  // Rephrase the initial question into a dereferenced standalone question based on
-  // the chat history to allow effective vectorstore querying.
-  const standaloneQuestionChain = RunnableSequence.from([
-    condenseQuestionPrompt,
-    model,
-    new StringOutputParser(),
-  ]);
+  // // Rephrase the initial question into a dereferenced standalone question based on
+  // // the chat history to allow effective vectorstore querying.
+  // const standaloneQuestionChain = RunnableSequence.from([
+  //   condenseQuestionPrompt,
+  //   model,
+  //   new StringOutputParser(),
+  // ]);
 
   // Retrieve documents based on a query, then format them.
   const retrievalChain = retriever.pipe(combineDocumentsFn);
@@ -73,13 +73,13 @@ export const makeChain = (retriever: VectorStoreRetriever) => {
 
   // First generate a standalone question, then answer it based on
   // chat history and retrieved context documents.
-  const conversationalRetrievalQAChain = RunnableSequence.from([
-    {
-      question: standaloneQuestionChain,
-      chat_history: (input) => input.chat_history,
-    },
-    answerChain,
-  ]);
+  // const conversationalRetrievalQAChain = RunnableSequence.from([
+  //   {
+  //     question: standaloneQuestionChain,
+  //     chat_history: (input) => input.chat_history,
+  //   },
+  //   answerChain,
+  // ]);
 
-  return conversationalRetrievalQAChain;
+  return answerChain;
 };
